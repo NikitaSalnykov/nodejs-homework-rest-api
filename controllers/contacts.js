@@ -4,8 +4,18 @@ const ctrlWrapper = require('../helpers/ctrlWrapper')
 
 
 const getAll = async (req, res) => {
-  const result = await Contact.find({}, 'name phone email')
-  res.json(result)
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 10, favorite } = req.query;
+  const skip = (page - 1) * limit;
+  let result;
+
+  if (favorite === 'true') { 
+    result = await Contact.find({ owner, favorite: true }, 'name phone email favorite', { skip, limit }).populate("owner", 'name phone');
+  } else {
+    result = await Contact.find({ owner }, 'name phone email favorite', { skip, limit }).populate("owner", 'name phone');
+  }
+
+  res.json(result);
 }
 
 const getById = async (req, res, next) => {
@@ -16,7 +26,8 @@ const getById = async (req, res, next) => {
 }
 
 const addContact = async (req, res, next) => {
-    const result = await Contact.create(req.body)
+    const {_id: owner} = req.user
+    const result = await Contact.create({...req.body, owner})
     res.status(201).json({message: "Create contact success"})
 }
 

@@ -21,7 +21,8 @@ const userSchema = new Schema(  {
     enum: ["starter", "pro", "business"],
     default: "starter"
   },
-  token: String,
+  token: { type: String, default: "" },
+  avatarURL: { type: String, required: true }
 },
   {
     versionKey: false,
@@ -44,11 +45,12 @@ const loginSchema = Joi.object({
 const updateSubscriptionSchema = Joi.object({
   subscription: Joi.valid('starter', 'pro', 'business').required()
 })
+
   
 const schemas = {
   registerSchema,
   loginSchema,
-  updateSubscriptionSchema
+  updateSubscriptionSchema,
 }
 
 const User = model('user', userSchema)
